@@ -8,11 +8,6 @@
     transform: scale(1.15) rotate(720deg);
 }
 
-/* 羽毛_css */
-.dropdown.wrapper {
-    background:url('https://jsd.nn.ci/gh/OuOumm/omo@main/data/img/yumao.webp') right bottom no-repeat;
-}
-
 /*首页文章选中缩放效果*/
 .blog-post .panel:not(article),.panel-small:not(article),.panel-picture:not(article):hover {
     transform: scale(0.95);
