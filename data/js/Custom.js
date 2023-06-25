@@ -1,11 +1,11 @@
 /* 复制成功 */ 
 kaygb_copy();function kaygb_copy(){$(document).ready(function(){$("body").bind('copy',function(e){hellolayer()})});var sitesurl=window.location.href;function hellolayer(){
     $.message({
-        message: "尊重原创，转载请注明出处！<br /> 本文作者：歆宋<br />原文链接："+sitesurl,
+        message: "尊重原创，转载请注明出处ᓚᘏᗢ<br/>本文作者：歆宋<br/>原文链接："+sitesurl,
         title: "复制成功",
         type: "warning",
         autoHide: !1,
-        time: "5000"
+        time: "3000"
         })
     }}
     /* 打字机特效 */
@@ -13,7 +13,7 @@ kaygb_copy();function kaygb_copy(){$(document).ready(function(){$("body").bind('
     POWERMODE.colorful=true;POWERMODE.shake=false;document.body.addEventListener("input",POWERMODE);
     /* 首次加载 */ 
     $.message({
-        message: "为了网站的正常运行，请不要使用广告屏蔽插件，谢谢！",
+        message: "为了网站的正常运行，请不要使用广告屏蔽插件，谢谢(❁´◡`❁)",
         title: "网站加载完成",
         type: "success",
         autoHide: !1,
