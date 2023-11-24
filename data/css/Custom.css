@@ -8,74 +8,58 @@
     transform: scale(1.15) rotate(720deg);
 }
 
-/*首页文章选中缩放效果*/
-.blog-post .panel:not(article),.panel-small:not(article),.panel-picture:not(article):hover {
+/* 首页文章选中缩放效果 */
+.blog-post .panel:not(article), .panel-small:not(article), .panel-picture:not(article):hover {
     transform: scale(0.95);
     box-shadow: 0 8px 10px rgba(73, 90, 47, 0.47);
 }
-/*赞赏图标跳动*/
+
+/* 赞赏图标跳动 */
 .btn-pay {
     animation: star 0.5s ease-in-out infinite alternate;
 }
 @keyframes star {
-    from {
-        transform: scale(1);
-    }
-    to {
-        transform: scale(1.1);
-    }
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
 }
 
-/*页面元素抖动*/
-.Pshake{
-    -webkit-animation: Pshake_Crazy 1s ease-in-out infinite;
+/* 页面元素抖动 */
+.Pshake {
     animation: Pshake_Crazy 1s ease-in-out infinite;
 }
-@keyframes Pshake_Crazy{
-    10%{transform:translate(-0.5px,-0.5px) rotate(0.5deg);}
-    20%{transform:translate(-0.5px,1.5px) rotate(0.5deg);}
-    30%{transform:translate(1.5px,0.5px) rotate(0.5deg);}
-    40%{transform:translate(1.5px,-0.5px) rotate(-0.5deg);}
-    50%{transform:translate(2.5px,1.5px) rotate(1.5deg);}
-    60%{transform:translate(-0.5px,-0.5px) rotate(-0.5deg);}
-    70%{transform:translate(-0.5px,2.5px) rotate(1.5deg);}
-    80%{transform:translate(2.5px,-1.5px) rotate(-0.5deg);}
-    90%{transform:translate(1.5px,-0.5px) rotate(1.5deg);}
-    0%,100%{transform:translate(0,0) rotate(0);}
+@keyframes Pshake_Crazy {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    10%, 60% { transform: translate(-0.5px, -0.5px) rotate(0.5deg); }
+    20%, 70% { transform: translate(-0.5px, 2.5px) rotate(1.5deg); }
+    30%, 80% { transform: translate(2.5px, -1.5px) rotate(-0.5deg); }
+    40%, 90% { transform: translate(1.5px, -0.5px) rotate(1.5deg); }
+    50% { transform: translate(2.5px, 1.5px) rotate(1.5deg); }
 }
 
-/*首页标题文字描边*/
-#post-panel .blog-post.post-list  a {
+/* 首页标题文字描边 */
+#post-panel .blog-post.post-list a {
     text-shadow: #000 0 0 4px, #000 0 0 4px, #000 0 0 4px, #000 0 0 4px;
 }
 
-/*修改夜间模式下的图片亮度*/
-.theme-dark img,.theme-dark figure a,.theme-dark .aplayer-pic {
-    filter:brightness(70%);
+/* 修改夜间模式下的图片亮度 */
+.theme-dark img, .theme-dark figure a, .theme-dark .aplayer-pic {
+    filter: brightness(70%);
     -webkit-filter: brightness(70%);
 }
 
-/*修改标题居中*/
-header {
-    text-align:center;
-    -webkit-text-align:left;
-}
-#header {
-    text-align:left;
-    -webkit-text-align:left;
+/* 修改标题居中和Logo位置调整 */
+header, #header {
+    text-align: center;
+    -webkit-text-align: center;
 }
 
-/*Logo位置调整*/
-element.style {
-}
+/* 页面元素间距调整 */
 .bg-danger .text-lt {
-    color: rgb(255, 255, 255) !important;
+    color: #fff !important;
 }
 .bg-danger a {
     margin-left: 10px;
 }
-
-/*调整文章标题下图标间距*/
 .plus-font-size {
-    padding-left: 0px;
+    padding-left: 0;
 }
