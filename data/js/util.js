@@ -1,248 +1,338 @@
-(function($) {
-    $.fn.navList = function() {
-        var $this = $(this);
-        $a = $this.find('a'), b = [];
-        $a.each(function() {
-            var $this = $(this),
-                indent = Math.max(0, $this.parents('li').length - 1),
-                href = $this.attr('href'),
-                target = $this.attr('target');
-            b.push('<a class="link depth-' + indent + '"' + ((typeof target !== 'undefined' && target != '') ? ' target="' + target + '"' : '') + ((typeof href !== 'undefined' && href != '') ? ' href="' + href + '"' : '') + '><span class="indent-' + indent + '"></span>' + $this.text() + '</a>')
-        });
-        return b.join('')
-    };
-    $.fn.panel = function(userConfig) {
-        if (this.length == 0) return $this;
-        if (this.length > 1) {
-            for (var i = 0; i < this.length; i++) $(this[i]).panel(userConfig);
-            return $this
-        }
-        var $this = $(this),
-            $body = $('body'),
-            $window = $(window),
-            id = $this.attr('id'),
-            config;
-        config = $.extend({
-            delay: 0,
-            hideOnClick: false,
-            hideOnEscape: false,
-            hideOnSwipe: false,
-            resetScroll: false,
-            resetForms: false,
-            side: null,
-            target: $this,
-            visibleClass: 'visible'
-        }, userConfig);
-        if (typeof config.target != 'jQuery') config.target = $(config.target);
-        $this._hide = function(event) {
-            if (!config.target.hasClass(config.visibleClass)) return;
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation()
-            }
-            config.target.removeClass(config.visibleClass);
-            window.setTimeout(function() {
-                if (config.resetScroll) $this.scrollTop(0);
-                if (config.resetForms) $this.find('form').each(function() {
-                    this.reset()
-                })
-            }, config.delay)
-        };
-        $this.css('-ms-overflow-style', '-ms-autohiding-scrollbar').css('-webkit-overflow-scrolling', 'touch');
-        if (config.hideOnClick) {
-            $this.find('a').css('-webkit-tap-highlight-color', 'rgba(0,0,0,0)');
-            $this.on('click', 'a', function(event) {
-                var $a = $(this),
-                    href = $a.attr('href'),
-                    target = $a.attr('target');
-                if (!href || href == '#' || href == '' || href == '#' + id) return;
-                event.preventDefault();
-                event.stopPropagation();
-                $this._hide();
-                window.setTimeout(function() {
-                    if (target == '_blank') window.open(href);
-                    else window.location.href = href
-                }, config.delay + 10)
-            })
-        }
-        $this.on('touchstart', function(event) {
-            $this.touchPosX = event.originalEvent.touches[0].pageX;
-            $this.touchPosY = event.originalEvent.touches[0].pageY
-        }) $this.on('touchmove', function(event) {
-            if ($this.touchPosX === null || $this.touchPosY === null) return;
-            var diffX = $this.touchPosX - event.originalEvent.touches[0].pageX,
-                diffY = $this.touchPosY - event.originalEvent.touches[0].pageY,
-                th = $this.outerHeight(),
-                ts = ($this.get(0).scrollHeight - $this.scrollTop());
-            if (config.hideOnSwipe) {
-                var result = false,
-                    boundary = 20,
-                    delta = 50;
-                switch (config.side) {
-                    case 'left':
-                        result = (diffY < boundary && diffY > (-1 * boundary)) && (diffX > delta);
-                        break;
-                    case 'right':
-                        result = (diffY < boundary && diffY > (-1 * boundary)) && (diffX < (-1 * delta));
-                        break;
-                    case 'top':
-                        result = (diffX < boundary && diffX > (-1 * boundary)) && (diffY > delta);
-                        break;
-                    case 'bottom':
-                        result = (diffX < boundary && diffX > (-1 * boundary)) && (diffY < (-1 * delta));
-                        break;
-                    default:
-                        break
-                }
-                if (result) {
-                    $this.touchPosX = null;
-                    $this.touchPosY = null;
-                    $this._hide();
-                    return false
-                }
-            }
-            if (($this.scrollTop() < 0 && diffY < 0) || (ts > (th - 2) && ts < (th + 2) && diffY > 0)) {
-                event.preventDefault();
-                event.stopPropagation()
-            }
-        });
-        $this.on('click touchend touchstart touchmove', function(event) {
-            event.stopPropagation()
-        });
-        $this.on('click', 'a[href="#' + id + '"]', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            config.target.removeClass(config.visibleClass)
-        });
-        $body.on('click touchend', function(event) {
-            $this._hide(event)
-        });
-        $body.on('click', 'a[href="#' + id + '"]', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            config.target.toggleClass(config.visibleClass)
-        });
-        if (config.hideOnEscape) $window.on('keydown', function(event) {
-            if (event.keyCode == 27) $this._hide(event)
-        });
-        return $this
-    };
-    $.fn.placeholder = function() {
-        if (typeof(document.createElement('input')).placeholder != 'undefined') return $(this);
-        if (this.length == 0) return $this;
-        if (this.length > 1) {
-            for (var i = 0; i < this.length; i++) $(this[i]).placeholder();
-            return $this
-        }
-        var $this = $(this);
-        $this.find('input[type=text],textarea').each(function() {
-            var i = $(this);
-            if (i.val() == '' || i.val() == i.attr('placeholder')) i.addClass('polyfill-placeholder').val(i.attr('placeholder'))
-        }).on('blur', function() {
-            var i = $(this);
-            if (i.attr('name').match(/-polyfill-field$/)) return;
-            if (i.val() == '') i.addClass('polyfill-placeholder').val(i.attr('placeholder'))
-        }).on('focus', function() {
-            var i = $(this);
-            if (i.attr('name').match(/-polyfill-field$/)) return;
-            if (i.val() == i.attr('placeholder')) i.removeClass('polyfill-placeholder').val('')
-        });
-        $this.find('input[type=password]').each(function() {
-            var i = $(this);
-            var x = $($('<div>').append(i.clone()).remove().html().replace(/type="password"/i, 'type="text"').replace(/type=password/i, 'type=text'));
-            if (i.attr('id') != '') x.attr('id', i.attr('id') + '-polyfill-field');
-            if (i.attr('name') != '') x.attr('name', i.attr('name') + '-polyfill-field');
-            x.addClass('polyfill-placeholder').val(x.attr('placeholder')).insertAfter(i);
-            if (i.val() == '') i.hide();
-            else x.hide();
-            i.on('blur', function(event) {
-                event.preventDefault();
-                var x = i.parent().find('input[name=' + i.attr('name') + '-polyfill-field]');
-                if (i.val() == '') {
-                    i.hide();
-                    x.show()
-                }
-            });
-            x.on('focus', function(event) {
-                event.preventDefault();
-                var i = x.parent().find('input[name=' + x.attr('name').replace('-polyfill-field', '') + ']');
-                x.hide();
-                i.show().focus()
-            }).on('keypress', function(event) {
-                event.preventDefault();
-                x.val('')
-            })
-        });
-        $this.on('submit', function() {
-            $this.find('input[type=text],input[type=password],textarea').each(function(event) {
-                var i = $(this);
-                if (i.attr('name').match(/-polyfill-field$/)) i.attr('name', '');
-                if (i.val() == i.attr('placeholder')) {
-                    i.removeClass('polyfill-placeholder');
-                    i.val('')
-                }
-            })
-        }).on('reset', function(event) {
-            event.preventDefault();
-            $this.find('select').val($('option:first').val());
-            $this.find('input,textarea').each(function() {
-                var i = $(this),
-                    x;
-                i.removeClass('polyfill-placeholder');
-                switch (this.type) {
-                    case 'submit':
-                    case 'reset':
-                        break;
-                    case 'password':
-                        i.val(i.attr('defaultValue'));
-                        x = i.parent().find('input[name=' + i.attr('name') + '-polyfill-field]');
-                        if (i.val() == '') {
-                            i.hide();
-                            x.show()
-                        } else {
-                            i.show();
-                            x.hide()
-                        }
-                        break;
-                    case 'checkbox':
-                    case 'radio':
-                        i.attr('checked', i.attr('defaultValue'));
-                        break;
-                    case 'text':
-                    case 'textarea':
-                        i.val(i.attr('defaultValue'));
-                        if (i.val() == '') {
-                            i.addClass('polyfill-placeholder');
-                            i.val(i.attr('placeholder'))
-                        }
-                        break;
-                    default:
-                        i.val(i.attr('defaultValue'));
-                        break
-                }
-            })
-        });
-        return $this
-    };
-    $.prioritize = function($elements, condition) {
-        var key = '__prioritize';
-        if (typeof $elements != 'jQuery') $elements = $($elements);
-        $elements.each(function() {
-            var $e = $(this),
-                $p, $parent = $e.parent();
-            if ($parent.length == 0) return;
-            if (!$e.data(key)) {
-                if (!condition) return;
-                $p = $e.prev();
-                if ($p.length == 0) return;
-                $e.prependTo($parent);
-                $e.data(key, $p)
-            } else {
-                if (condition) return;
-                $p = $e.data(key);
-                $e.insertAfter($p);
-                $e.removeData(key)
-            }
-        })
-    }
+(function(n) {
+	n.fn.navList = function() {
+		var t = n(this);
+		return $a = t.find("a"),
+		b = [],
+		$a.each(function() {
+			var t = n(this),
+			u = Math.max(0, t.parents("li").length - 1),
+			i = t.attr("href"),
+			r = t.attr("target");
+			b.push('<a class="link depth-' + u + '"' + (typeof r != "undefined" && r != "" ? ' target="' + r + '"': "") + (typeof i != "undefined" && i != "" ? ' href="' + i + '"': "") + '><span class="indent-' + u + '"><\/span>' + t.text() + "<\/a>")
+		}),
+		b.join("")
+	};
+	n.fn.panel = function(t) {
+		var u;
+		if (this.length == 0) return i;
+		if (this.length > 1) {
+			for (u = 0; u < this.length; u++) n(this[u]).panel(t);
+			return i
+		}
+		var i = n(this),
+		e = n("body"),
+		o = n(window),
+		f = i.attr("id"),
+		r;
+		if (r = n.extend({
+			delay: 0,
+			hideOnClick: !1,
+			hideOnEscape: !1,
+			hideOnSwipe: !1,
+			resetScroll: !1,
+			resetForms: !1,
+			side: null,
+			target: i,
+			visibleClass: "visible"
+		},
+		t), typeof r.target != "jQuery" && (r.target = n(r.target)), i._hide = function(n) {
+			r.target.hasClass(r.visibleClass) && (n && (n.preventDefault(), n.stopPropagation()), r.target.removeClass(r.visibleClass), window.setTimeout(function() {
+				r.resetScroll && i.scrollTop(0);
+				r.resetForms && i.find("form").each(function() {
+					this.reset()
+				})
+			},
+			r.delay))
+		},
+		i.css("-ms-overflow-style", "-ms-autohiding-scrollbar").css("-webkit-overflow-scrolling", "touch"), r.hideOnClick) {
+			i.find("a").css("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+			i.on("click", "a",
+			function(t) {
+				var e = n(this),
+				u = e.attr("href"),
+				o = e.attr("target");
+				u && u != "#" && u != "" && u != "#" + f && (t.preventDefault(), t.stopPropagation(), i._hide(), window.setTimeout(function() {
+					o == "_blank" ? window.open(u) : window.location.href = u
+				},
+				r.delay + 10))
+			})
+		}
+		i.on("touchstart",
+		function(n) {
+			i.touchPosX = n.originalEvent.touches[0].pageX;
+			i.touchPosY = n.originalEvent.touches[0].pageY
+		});
+		i.on("touchmove",
+		function(n) {
+			if (i.touchPosX !== null && i.touchPosY !== null) {
+				var f = i.touchPosX - n.originalEvent.touches[0].pageX,
+				t = i.touchPosY - n.originalEvent.touches[0].pageY,
+				s = i.outerHeight(),
+				h = i.get(0).scrollHeight - i.scrollTop();
+				if (r.hideOnSwipe) {
+					var e = !1,
+					u = 20,
+					o = 50;
+					switch (r.side) {
+					case "left":
+						e = t < u && t > -1 * u && f > o;
+						break;
+					case "right":
+						e = t < u && t > -1 * u && f < -1 * o;
+						break;
+					case "top":
+						e = f < u && f > -1 * u && t > o;
+						break;
+					case "bottom":
+						e = f < u && f > -1 * u && t < -1 * o
+					}
+					if (e) return i.touchPosX = null,
+					i.touchPosY = null,
+					i._hide(),
+					!1
+				} (i.scrollTop() < 0 && t < 0 || h > s - 2 && h < s + 2 && t > 0) && (n.preventDefault(), n.stopPropagation())
+			}
+		});
+		i.on("click touchend touchstart touchmove",
+		function(n) {
+			n.stopPropagation()
+		});
+		i.on("click", 'a[href="#' + f + '"]',
+		function(n) {
+			n.preventDefault();
+			n.stopPropagation();
+			r.target.removeClass(r.visibleClass)
+		});
+		e.on("click touchend",
+		function(n) {
+			i._hide(n)
+		});
+		e.on("click", 'a[href="#' + f + '"]',
+		function(n) {
+			n.preventDefault();
+			n.stopPropagation();
+			r.target.toggleClass(r.visibleClass)
+		});
+		if (r.hideOnEscape) o.on("keydown",
+		function(n) {
+			n.keyCode == 27 && i._hide(n)
+		});
+		return i
+	};
+	n.fn.placeholder = function() {
+		var i, t;
+		if (typeof document.createElement("input").placeholder != "undefined") return n(this);
+		if (this.length == 0) return t;
+		if (this.length > 1) {
+			for (i = 0; i < this.length; i++) n(this[i]).placeholder();
+			return t
+		}
+		t = n(this);
+		t.find("input[type=text],textarea").each(function() {
+			var t = n(this); (t.val() == "" || t.val() == t.attr("placeholder")) && t.addClass("polyfill-placeholder").val(t.attr("placeholder"))
+		}).on("blur",
+		function() {
+			var t = n(this);
+			t.attr("name").match(/-polyfill-field$/) || t.val() == "" && t.addClass("polyfill-placeholder").val(t.attr("placeholder"))
+		}).on("focus",
+		function() {
+			var t = n(this);
+			t.attr("name").match(/-polyfill-field$/) || t.val() == t.attr("placeholder") && t.removeClass("polyfill-placeholder").val("")
+		});
+		t.find("input[type=password]").each(function() {
+			var t = n(this),
+			i = n(n("<div>").append(t.clone()).remove().html().replace(/type="password"/i, 'type="text"').replace(/type=password/i, "type=text"));
+			t.attr("id") != "" && i.attr("id", t.attr("id") + "-polyfill-field");
+			t.attr("name") != "" && i.attr("name", t.attr("name") + "-polyfill-field");
+			i.addClass("polyfill-placeholder").val(i.attr("placeholder")).insertAfter(t);
+			t.val() == "" ? t.hide() : i.hide();
+			t.on("blur",
+			function(n) {
+				n.preventDefault();
+				var i = t.parent().find("input[name=" + t.attr("name") + "-polyfill-field]");
+				t.val() == "" && (t.hide(), i.show())
+			});
+			i.on("focus",
+			function(n) {
+				n.preventDefault();
+				var t = i.parent().find("input[name=" + i.attr("name").replace("-polyfill-field", "") + "]");
+				i.hide();
+				t.show().focus()
+			}).on("keypress",
+			function(n) {
+				n.preventDefault();
+				i.val("")
+			})
+		});
+		t.on("submit",
+		function() {
+			t.find("input[type=text],input[type=password],textarea").each(function() {
+				var t = n(this);
+				t.attr("name").match(/-polyfill-field$/) && t.attr("name", "");
+				t.val() == t.attr("placeholder") && (t.removeClass("polyfill-placeholder"), t.val(""))
+			})
+		}).on("reset",
+		function(i) {
+			i.preventDefault();
+			t.find("select").val(n("option:first").val());
+			t.find("input,textarea").each(function() {
+				var t = n(this),
+				i;
+				t.removeClass("polyfill-placeholder");
+				switch (this.type) {
+				case "submit":
+				case "reset":
+					break;
+				case "password":
+					t.val(t.attr("defaultValue"));
+					i = t.parent().find("input[name=" + t.attr("name") + "-polyfill-field]");
+					t.val() == "" ? (t.hide(), i.show()) : (t.show(), i.hide());
+					break;
+				case "checkbox":
+				case "radio":
+					t.attr("checked", t.attr("defaultValue"));
+					break;
+				case "text":
+				case "textarea":
+					t.val(t.attr("defaultValue"));
+					t.val() == "" && (t.addClass("polyfill-placeholder"), t.val(t.attr("placeholder")));
+					break;
+				default:
+					t.val(t.attr("defaultValue"))
+				}
+			})
+		});
+		return t
+	};
+	n.prioritize = function(t, i) {
+		var r = "__prioritize";
+		typeof t != "jQuery" && (t = n(t));
+		t.each(function() {
+			var t = n(this),
+			u,
+			f = t.parent();
+			if (f.length != 0) if (t.data(r)) {
+				if (i) return;
+				u = t.data(r);
+				t.insertAfter(u);
+				t.removeData(r)
+			} else {
+				if (!i) return;
+				if (u = t.prev(), u.length == 0) return;
+				t.prependTo(f);
+				t.data(r, u)
+			}
+		})
+	}
+})(jQuery); (function($) {
+	skel.breakpoints({
+		xlarge: '(max-width: 1680px)',
+		large: '(max-width: 1280px)',
+		medium: '(max-width: 980px)',
+		small: '(max-width: 736px)',
+		xsmall: '(max-width: 480px)',
+		xxsmall: '(max-width: 360px)'
+	});
+	$(function() {
+		var $window = $(window),
+		$document = $(document),
+		$body = $('body'),
+		$wrapper = $('#wrapper'),
+		$footer = $('#footer');
+		function removeLoadingClass() {
+			$body.removeClass('is-loading-0');
+			setTimeout(function() {
+				$body.removeClass('is-loading-1')
+			},
+			1500)
+		}
+		$window.on('load',
+		function() {
+			setTimeout(removeLoadingClass, 100)
+		});
+		$('form').placeholder();
+		var $panels = $wrapper.children('.panel'),
+		locked = true;
+		function setBackgroundImage($image, $img) {
+			var position = $img.data('position');
+			$image.css('background-image', 'url(' + $img.attr('src') + ')');
+			if (position) $image.css('background-position', position);
+			$img.hide()
+		}
+		$panels.not($panels.first()).addClass('inactive').hide();
+		$panels.each(function() {
+			var $this = $(this),
+			$image = $this.children('.image'),
+			$img = $image.find('img');
+			setBackgroundImage($image, $img)
+		});
+		setTimeout(function() {
+			locked = false
+		},
+		1250);
+		$('a[href^="#"]').on('click',
+		function(event) {
+			var $this = $(this),
+			id = $this.attr('href'),
+			$panel = $(id),
+			$ul = $this.parents('ul'),
+			delay = 0;
+			event.preventDefault();
+			event.stopPropagation();
+			if (locked) return;
+			locked = true;
+			$this.addClass('active');
+			if ($ul.hasClass('spinX') || $ul.hasClass('spinY')) delay = 250;
+			setTimeout(function() {
+				$panels.addClass('inactive');
+				$footer.addClass('inactive');
+				setTimeout(function() {
+					$panels.hide();
+					$panel.show();
+					$document.scrollTop(0);
+					setTimeout(function() {
+						$panel.removeClass('inactive');
+						$this.removeClass('active');
+						locked = false;
+						$window.triggerHandler('--refresh');
+						setTimeout(function() {
+							$footer.removeClass('inactive')
+						},
+						250)
+					},
+					100)
+				},
+				350)
+			},
+			delay)
+		});
+		if (skel.vars.IEVersion < 12) {
+			$window.on('--refresh',
+			function() {
+				$wrapper.css('height', 'auto');
+				setTimeout(function() {
+					var h = $wrapper.height(),
+					wh = $window.height();
+					if (h < wh) $wrapper.css('height', '100vh')
+				},
+				0);
+				if (skel.vars.IEVersion < 10) {
+					var $panel = $('.panel').not('.inactive'),
+					$image = $panel.find('.image'),
+					$content = $panel.find('.content'),
+					ih = $image.height(),
+					ch = $content.height(),
+					x = Math.max(ih, ch);
+					$image.css('min-height', x + 'px');
+					$content.css('min-height', x + 'px')
+				}
+			});
+			$window.on('load',
+			function() {
+				$window.triggerHandler('--refresh')
+			});
+			$('.spinX').removeClass('spinX');
+			$('.spinY').removeClass('spinY')
+		}
+	})
 })(jQuery);
