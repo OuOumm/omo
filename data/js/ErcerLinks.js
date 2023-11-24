@@ -8,7 +8,7 @@ const submitLink = (() => {
 
     return formId => {
         count++;
-        if (count >= threshold) {
+        if (count > threshold) {
             const currentTime = new Date().getTime(); // 获取当前时间戳
             if (currentTime - lastCallTime < limitTime) { // 如果当前时间与上次调用时间小于限制时间
                 const remainingTime = Math.floor((lastCallTime + limitTime - currentTime) / 1000);
