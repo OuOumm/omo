@@ -2,7 +2,7 @@
 .img-circle {
     border-radius: 50%;
     animation: light 4s ease-in-out infinite;
-    transition: all 0.5s;
+    transition: transform 0.5s;
 }
 .img-circle:hover {
     transform: scale(1.15) rotate(720deg);
@@ -19,7 +19,7 @@
     animation: star 0.5s ease-in-out infinite alternate;
 }
 @keyframes star {
-    from { transform: scale(1); }
+    from, to { transform: scale(1); }
     to { transform: scale(1.1); }
 }
 
@@ -29,32 +29,27 @@
 }
 @keyframes Pshake_Crazy {
     0%, 100% { transform: translate(0, 0) rotate(0); }
-    10%, 60% { transform: translate(-0.5px, -0.5px) rotate(0.5deg); }
-    20%, 70% { transform: translate(-0.5px, 2.5px) rotate(1.5deg); }
-    30%, 80% { transform: translate(2.5px, -1.5px) rotate(-0.5deg); }
-    40%, 90% { transform: translate(1.5px, -0.5px) rotate(1.5deg); }
-    50% { transform: translate(2.5px, 1.5px) rotate(1.5deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translate(-0.5px, -0.5px) rotate(0.5deg); }
+    20%, 40%, 60%, 80% { transform: translate(-0.5px, 2.5px) rotate(1.5deg); }
 }
 
 /* 首页标题文字描边 */
 #post-panel .blog-post.post-list a {
-    text-shadow: #000 0 0 4px, #000 0 0 4px, #000 0 0 4px, #000 0 0 4px;
+    text-shadow: 0 0 4px #000;
 }
 
 /* 修改夜间模式下的图片亮度 */
 .theme-dark img, .theme-dark figure a, .theme-dark .aplayer-pic {
     filter: brightness(70%);
-    -webkit-filter: brightness(70%);
 }
 
 /* 修改标题居中和Logo位置调整 */
 header, #header {
     text-align: center;
-    -webkit-text-align: center;
 }
 
 /* 页面元素间距调整 */
-.bg-danger .text-lt {
+.bg-danger {
     color: #fff !important;
 }
 .bg-danger a {
